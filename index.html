@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RK SENSI</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  font-family:Arial, sans-serif;
+}
+
+body{
+  margin:0;
+  background:#000;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  color:red;
+}
+
+.box{
+  width:320px;
+  padding:20px;
+  border:2px solid red;
+  border-radius:18px;
+  box-shadow:0 0 30px red;
+  display:none;
+}
+
+.box.active{
+  display:block;
+}
+
+h2{
+  text-align:center;
+}
+
+input{
+  width:100%;
+  padding:12px;
+  background:#000;
+  border:1px solid red;
+  color:red;
+  text-align:center;
+  margin-bottom:15px;
+}
+
+.btn-center{
+  display:flex;
+  justify-content:center;
+}
+
+button{
+  background:#000;
+  border:2px solid red;
+  color:red;
+  border-radius:14px;
+  padding:10px 25px;
+  cursor:pointer;
+  box-shadow:0 0 12px red;
+}
+
+.item{
+  display:flex;
+  justify-content:space-between;
+  margin:6px 0;
+}
+
+.toggle{
+  width:40px;
+  height:18px;
+  background:#222;
+  border-radius:20px;
+  position:relative;
+}
+
+.toggle::after{
+  content:"";
+  width:14px;
+  height:14px;
+  background:#fff;
+  border-radius:50%;
+  position:absolute;
+  top:2px;
+  left:2px;
+  transition:.3s;
+}
+
+.toggle.active{
+  background:#400;
+}
+
+.toggle.active::after{
+  left:22px;
+  background:red;
+}
+
+input[type=range]{
+  -webkit-appearance:none;
+  width:100%;
+  height:8px;
+  border-radius:5px;
+  background:#400;
+  box-shadow:0 0 15px red;
+}
+
+.mira-area{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-top:15px;
+}
+
+.boneco{
+  width:130px;
+}
+
+.boneco path{
+  fill:white;
+  stroke:black;
+  stroke-width:4;
+}
+
+.marcado{
+  fill:red !important;
+}
+
+.mira-botoes{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.toast{
+  position:fixed;
+  top:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#000;
+  border:2px solid red;
+  padding:10px 20px;
+  display:none;
+  box-shadow:0 0 15px red;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div class="box active" id="loginBox">
+  <h2>LOGIN</h2>
+  <input type="password" id="senha" placeholder="Digite a senha">
+  <div class="btn-center">
+    <button onclick="login()">CONFIRMAR</button>
+  </div>
+</div>
+
+<!-- AUXILIOS -->
+<div class="box" id="auxilios">
+  <h2>AUXÍLIOS</h2>
+
+  <div class="item"><span>Diminuir Tremedeira</span><div class="toggle" onclick="ativar(this)"></div></div>
+  <div class="item"><span>Mira Suave</span><div class="toggle" onclick="ativar(this)"></div></div>
+  <div class="item"><span>Aim Neck</span><div class="toggle" onclick="ativar(this)"></div></div>
+  <div class="item"><span>Aim Pull</span><div class="toggle" onclick="ativar(this)"></div></div>
+
+  <label>ESTABILIZAR: <span id="valorSlider">0%</span></label>
+  <input type="range" id="estabilizar" min="0" max="100" value="0" oninput="atualizarSlider(this.value)">
+
+  <div class="mira-area">
+
+    <svg class="boneco" viewBox="0 0 200 400">
+      <path id="cabeca" d="M100 20 C70 20 60 60 60 80 C60 110 80 130 100 130 C120 130 140 110 140 80 C140 60 130 20 100 20Z"/>
+      <path id="pescoco" d="M85 130 H115 V155 H85 Z"/>
+      <path id="barriga" d="M60 155 C40 230 40 300 70 360 H130 C160 300 160 230 140 155 Z"/>
+    </svg>
+
+    <div class="mira-botoes">
+      <button onclick="selecionarParte('cabeca')">CABEÇA</button>
+      <button onclick="selecionarParte('pescoco')">PESCOÇO</button>
+      <button onclick="selecionarParte('barriga')">BARRIGA</button>
+    </div>
+
+  </div>
+
+  <button onclick="voltarLogin()">VOLTAR AO LOGIN</button>
+  <button onclick="mostrarToast()">ATIVAR</button>
+</div>
+
+<div class="toast" id="toast">Auxílio ativado ☠️</div>
+
+<script>
+const senhaCorreta = "13";
+
+function login(){
+  const loginBox = document.getElementById("loginBox");
+  const aux = document.getElementById("auxilios");
+  const senha = document.getElementById("senha");
+
+  if(senha.value === senhaCorreta){
+    loginBox.classList.remove("active");
+    aux.classList.add("active");
+  }else{
+    alert("Senha incorreta");
+  }
+}
+
+function voltarLogin(){
+  document.getElementById("auxilios").classList.remove("active");
+  document.getElementById("loginBox").classList.add("active");
+  document.getElementById("senha").value="";
+}
+
+function ativar(el){
+  el.classList.toggle("active");
+}
+
+function atualizarSlider(v){
+  document.getElementById("valorSlider").innerText = v+"%";
+  let cor="red";
+  if(v>=40) cor="yellow";
+  if(v>=70) cor="lime";
+  const s = document.getElementById("estabilizar");
+  s.style.background=`linear-gradient(to right, ${cor} ${v}%, #400 ${v}%)`;
+  s.style.boxShadow=`0 0 18px ${cor}`;
+}
+
+function selecionarParte(id){
+  ["cabeca","pescoco","barriga"].forEach(p=>{
+    document.getElementById(p).classList.remove("marcado");
+  });
+  document.getElementById(id).classList.add("marcado");
+}
+
+function mostrarToast(){
+  const t=document.getElementById("toast");
+  t.style.display="block";
+  setTimeout(()=>t.style.display="none",2000);
+}
+
+atualizarSlider(0);
+</script>
+
+</body>
+</html>
